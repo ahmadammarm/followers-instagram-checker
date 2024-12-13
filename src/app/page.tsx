@@ -107,7 +107,7 @@ export default function Home() {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[720px]">
                     <DialogHeader>
-                        <DialogTitle className="mb-5">Tutorial Mengunduh File JSON</DialogTitle>
+                        <DialogTitle className="mb-5">Tutorial Mengunduh File JSON Follower dan Following</DialogTitle>
                     </DialogHeader>
                     <Carousel className="w-full max-w-lg mx-auto">
                         <CarouselContent>
@@ -128,6 +128,7 @@ export default function Home() {
                                                 <Link
                                                     href="https://accountscenter.instagram.com/info_and_permissions/"
                                                     className="text-blue-600 mt-2 hover:underline"
+                                                    target="_blank"
                                                 >
                                                     Pusat akun Anda
                                                 </Link>
