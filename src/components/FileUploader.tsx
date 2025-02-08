@@ -1,11 +1,23 @@
 "use client";
-
 import React, { useState } from "react";
 import { Input } from "./ui/input";
 
 interface User {
     value: string;
     href: string;
+}
+
+interface StringListData {
+    href: string;
+    value: string;
+}
+
+interface DataItem {
+    string_list_data: StringListData[];
+}
+
+interface FollowingData {
+    relationships_following: DataItem[];
 }
 
 interface FileUploaderProps {
@@ -15,7 +27,7 @@ interface FileUploaderProps {
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({ label, fileType, onFileUploaded }) => {
-    const [error, setError] = useState("");
+    const [error, setError] = useState<string>("");
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -23,19 +35,25 @@ const FileUploader: React.FC<FileUploaderProps> = ({ label, fileType, onFileUplo
 
         try {
             const fileContent = await file.text();
-            const jsonData = JSON.parse(fileContent);
+            const jsonData: DataItem[] | FollowingData = JSON.parse(fileContent);
 
-            const extractData = (data: any[], _key: string): User[] =>
-                data.flatMap(item => item.string_list_data?.map((user: { href: string; value: string }) => ({
-                    href: user.href,
-                    value: user.value,
-                })) || []);
+            const extractData = (data: DataItem[], key: "string_list_data"): User[] =>
+                data.flatMap(item =>
+                    item[key]?.map((user: StringListData) => ({
+                        href: user.href,
+                        value: user.value,
+                    })) || []
+                );
 
             let extractedData: User[] = [];
 
             if (fileType === "followers" && Array.isArray(jsonData)) {
                 extractedData = extractData(jsonData, "string_list_data");
-            } else if (fileType === "following" && jsonData.relationships_following && Array.isArray(jsonData.relationships_following)) {
+            } else if (
+                fileType === "following" &&
+                "relationships_following" in jsonData &&
+                Array.isArray(jsonData.relationships_following)
+            ) {
                 extractedData = extractData(jsonData.relationships_following, "string_list_data");
             } else {
                 throw new Error(`Format file ${fileType} tidak valid.`);
