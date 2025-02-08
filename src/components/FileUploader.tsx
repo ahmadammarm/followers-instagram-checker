@@ -3,16 +3,17 @@
 import React, { useState } from "react";
 import { Input } from "./ui/input";
 
+interface User {
+    value: string;
+    href: string;
+}
+
 interface FileUploaderProps {
     label: string;
     fileType: "followers" | "following";
     onFileUploaded: (data: User[]) => void;
 }
 
-interface User {
-    href: string;
-    value: string;
-}
 
 const FileUploader: React.FC<FileUploaderProps> = ({ label, fileType, onFileUploaded }) => {
     const [error, setError] = useState("");
