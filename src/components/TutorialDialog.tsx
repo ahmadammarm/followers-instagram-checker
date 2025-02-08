@@ -8,42 +8,42 @@ import Link from 'next/link'
 
 const tutorialSteps = [
     {
-        title: "Pergi ke URL Pusat akun Anda",
+        title: "1. Pergi ke URL Pusat akun Anda",
         description: 'Klik menu "Unduh informasi Anda"',
         image: "/images/step-1.png",
     },
     {
-        title: "Pilih Menu",
+        title: "2. Pilih Menu",
         description: 'Pastikan Anda memilih menu "Mengunduh dan mentransfer informasi " ',
         image: "/images/step-2.png",
     },
     {
-        title: "Pilih Beberapa Informasi",
+        title: "3. Pilih Beberapa Informasi",
         description: 'Pastikan Anda memilih menu "Beberapa informasi Anda " ',
         image: "/images/step-3.png",
     },
     {
-        title: "Pilih Koneksi",
+        title: "4. Pilih Koneksi",
         description: 'Pastikan Anda memilih "Pengikut dan mengikuti " ',
         image: "/images/step-4.png",
     },
     {
-        title: "Pilih Unduh ke Perangkat",
+        title: "5. Pilih Unduh ke Perangkat",
         description: 'Pastikan Anda memilih menu "Unduh ke Perangkat " ',
         image: "/images/step-5.png",
     },
     {
-        title: "Ubah Rentang Tanggal dan Format File",
+        title: "6. Ubah Rentang Tanggal dan Format File",
         description: "Pastikan Anda mengubah rentang waktu menjadi sepanjang waktu dan ubah format file menjadi JSON",
         image: "/images/step-6.png",
     },
     {
-        title: "Download dan Ekstrak File",
+        title: "7. Download dan Ekstrak File",
         description: "Setelah selesai, download file dan ekstrak file tersebut",
         image: "/images/step-7.png",
     },
     {
-        title: "Pilih File Followers dan Following",
+        title: "8. Pilih File Followers dan Following",
         description: "Upload file JSON followers_1 dan following yang telah diunduh ke web ini",
         image: "/images/step-8.png",
     },
