@@ -35,31 +35,44 @@ const FileUploader: React.FC<FileUploaderProps> = ({ label, fileType, onFileUplo
 
         try {
             const fileContent = await file.text();
-            const jsonData: DataItem[] | FollowingData = JSON.parse(fileContent);
+            const jsonData: any = JSON.parse(fileContent);
 
-            const extractData = (data: DataItem[], key: "string_list_data"): User[] =>
-                data.flatMap(item =>
-                    item[key]?.map((user: StringListData) => ({
-                        href: user.href,
-                        value: user.value,
-                    })) || []
-                ).filter(user => user.value && user.href);
+            const extractUsername = (href: string): string => {
+                try {
+                    // Handle both https://www.instagram.com/username and https://www.instagram.com/_u/username
+                    const url = new URL(href);
+                    const parts = url.pathname.split("/").filter(Boolean);
+                    return parts[parts.length - 1].toLowerCase();
+                } catch (e) {
+                    const parts = href.split("/").filter(Boolean);
+                    return parts[parts.length - 1].toLowerCase();
+                }
+            };
 
             let extractedData: User[] = [];
 
-            if (fileType === "followers" && Array.isArray(jsonData)) {
-                extractedData = extractData(jsonData, "string_list_data");
-            } else if (
-                fileType === "following" &&
-                "relationships_following" in jsonData &&
-                Array.isArray(jsonData.relationships_following)
-            ) {
-                extractedData = extractData(jsonData.relationships_following, "string_list_data");
-            } else {
-                throw new Error(`Format file ${fileType} tidak valid.`);
+            if (fileType === "followers") {
+                // Followers can be an array (old) or an object with relationships_followers (new)
+                const items = Array.isArray(jsonData) ? jsonData : jsonData.relationships_followers || [];
+                extractedData = items.flatMap((item: any) =>
+                    item.string_list_data?.map((user: any) => ({
+                        href: user.href,
+                        value: extractUsername(user.href),
+                    })) || []
+                );
+            } else if (fileType === "following") {
+                const items = jsonData.relationships_following || [];
+                extractedData = items.flatMap((item: any) =>
+                    item.string_list_data?.map((user: any) => ({
+                        href: user.href,
+                        value: extractUsername(user.href),
+                    })) || []
+                );
             }
 
-            onFileUploaded(extractedData);
+            // Final filter to ensure we have valid data
+            const cleanData = extractedData.filter(user => user.value && user.href);
+            onFileUploaded(cleanData);
             setError("");
         } catch (error) {
             console.error(error);
