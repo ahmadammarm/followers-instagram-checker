@@ -17,6 +17,8 @@ export default function Home() {
     const [result, setResult] = useState<User[]>([])
     const [searchQuery, setSearchQuery] = useState<string>("")
     const [whitelist, setWhitelist] = useState<string[]>([])
+    const [hasCompared, setHasCompared] = useState(false)
+    const [allSeenUsers, setAllSeenUsers] = useState<Map<string, string>>(new Map())
 
     // Load whitelist from localStorage on mount
     useEffect(() => {
@@ -52,6 +54,7 @@ export default function Home() {
             )
 
             setResult(notFollowingBack)
+            setHasCompared(true)
         }
     }
 
@@ -62,32 +65,62 @@ export default function Home() {
         return !isWhitelisted && matchesSearch
     })
 
-    const whitelistedData = result.filter((user) => whitelist.includes(user.href))
+    useEffect(() => {
+        if (result.length > 0) {
+            setAllSeenUsers(prev => {
+                const next = new Map(prev)
+                result.forEach(u => next.set(u.href, u.value))
+                return next
+            })
+        }
+    }, [result])
+
+    const whitelistedData = whitelist.map(href => ({
+        href,
+        value: allSeenUsers.get(href) || href.split('/').filter(Boolean).pop() || href
+    }))
 
     return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
             <h1 className="text-4xl md:text-5xl font-black mb-8 mt-10 uppercase tracking-tighter text-center">
                 Instagram Follower Checker
             </h1>
-            <FileUploader
-                label="Upload File JSON Follower"
-                fileType="followers"
-                onFileUploaded={(data) => setFollowers(data)}
-            />
-            <FileUploader
-                label="Upload File JSON Following"
-                fileType="following"
-                onFileUploaded={(data) => setFollowing(data)}
-            />
-            <TutorialDialog />
-            <Button
-                onClick={handleCompare}
-                className="mt-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                disabled={!following || !followers}
-            >
-                Bandingkan
-            </Button>
-            {result.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-4xl">
+                <FileUploader
+                    label="Upload File JSON Follower"
+                    fileType="followers"
+                    onFileUploaded={(data) => {
+                        setFollowers(data)
+                        setHasCompared(false)
+                    }}
+                />
+                <FileUploader
+                    label="Upload File JSON Following"
+                    fileType="following"
+                    onFileUploaded={(data) => {
+                        setFollowing(data)
+                        setHasCompared(false)
+                    }}
+                />
+            </div>
+            <div className="flex flex-col items-center gap-4 mt-4">
+                <TutorialDialog />
+                <Button
+                    onClick={handleCompare}
+                    className="px-10 py-6 bg-blue-500 text-white border-2 border-black shadow-neo hover:bg-blue-400 font-black uppercase text-xl"
+                    disabled={!following || !followers}
+                >
+                    Bandingkan Sekarang
+                </Button>
+            </div>
+
+            {hasCompared && result.length === 0 && (
+                <div className="mt-10 p-8 border-4 border-black bg-green-400 shadow-neo max-w-2xl text-center">
+                    <h2 className="text-2xl font-black uppercase">Hebat! Semua orang mem-follow balik akun Anda.</h2>
+                </div>
+            )}
+
+            {hasCompared && result.length > 0 && (
                 <ResultTable
                     result={filteredResult}
                     onWhitelist={handleAddToWhitelist}

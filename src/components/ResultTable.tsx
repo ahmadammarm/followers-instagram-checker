@@ -102,107 +102,117 @@ const ResultTable: React.FC<ResultTableProps> = ({
                 </div>
             </div>
 
-            {/* Tampilan Mobile */}
-            <div className="md:hidden space-y-6">
-                {paginatedResult.map((user, index) => (
-                    <Card key={index} className="border-2 border-black shadow-neo bg-white rounded-none">
-                        <CardHeader>
-                            <CardTitle className="text-lg font-black uppercase">
-                                {(currentPage - 1) * itemsPerPage + index + 1}. {user.value}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex flex-col gap-3">
-                                <Button asChild variant="outline" className="w-full bg-blue-400 hover:bg-blue-300 border-2 border-black shadow-neo-sm font-bold uppercase">
-                                    <a
-                                        href={user.href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center justify-center"
-                                    >
-                                        Lihat Profil <ExternalLink className="ml-2 h-4 w-4" />
-                                    </a>
-                                </Button>
-                                <Button 
-                                    variant="outline" 
-                                    onClick={() => onWhitelist(user.href)}
-                                    className="w-full bg-slate-200 hover:bg-slate-300 border-2 border-black shadow-neo-sm font-bold uppercase"
-                                >
-                                    <EyeOff className="mr-2 h-4 w-4" /> Sembunyikan
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-
-            {/* Tampilan Desktop */}
-            <div className="hidden md:block">
-                <div className="rounded-none border-4 border-black shadow-neo bg-white overflow-hidden">
-                    <Table>
-                        <TableHeader className="bg-black">
-                            <TableRow className="hover:bg-black border-none">
-                                <TableHead className="w-[100px] text-white font-black uppercase">No</TableHead>
-                                <TableHead className="text-white font-black uppercase">Username</TableHead>
-                                <TableHead className="text-white font-black uppercase">Aksi</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {paginatedResult.map((user, index) => (
-                                <TableRow key={index} className="border-b-2 border-black hover:bg-slate-50">
-                                    <TableCell className="font-black">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-                                    <TableCell className="font-bold uppercase">{user.value}</TableCell>
-                                    <TableCell>
-                                        <div className="flex gap-2">
-                                            <Button asChild variant="outline" size="sm" className="bg-cyan-400 hover:bg-cyan-300 border-2 border-black shadow-neo-sm font-bold uppercase">
-                                                <a
-                                                    href={user.href}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="flex items-center"
-                                                >
-                                                    Profil <ExternalLink className="ml-2 h-4 w-4" />
-                                                </a>
-                                            </Button>
-                                            <Button 
-                                                variant="outline" 
-                                                size="sm" 
-                                                onClick={() => onWhitelist(user.href)}
-                                                className="bg-slate-200 hover:bg-slate-300 border-2 border-black shadow-neo-sm font-bold uppercase"
-                                            >
-                                                <EyeOff className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+            {paginatedResult.length === 0 ? (
+                <div className="p-12 border-4 border-black bg-white text-center shadow-neo">
+                    <p className="text-xl font-black uppercase">Tidak ada hasil yang cocok dengan pencarian atau semua sudah disembunyikan.</p>
                 </div>
-            </div>
+            ) : (
+                <>
+                    {/* Tampilan Mobile */}
+                    <div className="md:hidden space-y-6">
+                        {paginatedResult.map((user, index) => (
+                            <Card key={index} className="border-2 border-black shadow-neo bg-white rounded-none">
+                                <CardHeader>
+                                    <CardTitle className="text-lg font-black uppercase">
+                                        {(currentPage - 1) * itemsPerPage + index + 1}. {user.value}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="flex flex-col gap-3">
+                                        <Button asChild variant="outline" className="w-full bg-blue-400 hover:bg-blue-300 border-2 border-black shadow-neo-sm font-bold uppercase">
+                                            <a
+                                                href={user.href}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center justify-center"
+                                            >
+                                                Lihat Profil <ExternalLink className="ml-2 h-4 w-4" />
+                                            </a>
+                                        </Button>
+                                        <Button 
+                                            variant="outline" 
+                                            onClick={() => onWhitelist(user.href)}
+                                            className="w-full bg-slate-200 hover:bg-slate-300 border-2 border-black shadow-neo-sm font-bold uppercase"
+                                        >
+                                            <EyeOff className="mr-2 h-4 w-4" /> Sembunyikan
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+
+                    {/* Tampilan Desktop */}
+                    <div className="hidden md:block">
+                        <div className="rounded-none border-4 border-black shadow-neo bg-white overflow-hidden">
+                            <Table>
+                                <TableHeader className="bg-black">
+                                    <TableRow className="hover:bg-black border-none">
+                                        <TableHead className="w-[100px] text-white font-black uppercase">No</TableHead>
+                                        <TableHead className="text-white font-black uppercase">Username</TableHead>
+                                        <TableHead className="text-white font-black uppercase">Aksi</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {paginatedResult.map((user, index) => (
+                                        <TableRow key={index} className="border-b-2 border-black hover:bg-slate-50">
+                                            <TableCell className="font-black">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
+                                            <TableCell className="font-bold uppercase">{user.value}</TableCell>
+                                            <TableCell>
+                                                <div className="flex gap-2">
+                                                    <Button asChild variant="outline" size="sm" className="bg-cyan-400 hover:bg-cyan-300 border-2 border-black shadow-neo-sm font-bold uppercase">
+                                                        <a
+                                                            href={user.href}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center"
+                                                        >
+                                                            Profil <ExternalLink className="ml-2 h-4 w-4" />
+                                                        </a>
+                                                    </Button>
+                                                    <Button 
+                                                        variant="outline" 
+                                                        size="sm" 
+                                                        onClick={() => onWhitelist(user.href)}
+                                                        className="bg-slate-200 hover:bg-slate-300 border-2 border-black shadow-neo-sm font-bold uppercase"
+                                                    >
+                                                        <EyeOff className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </div>
+                </>
+            )}
 
             {/* Pagination untuk table */}
-            <div className="flex justify-between items-center mt-10 mb-20">
-                <Button
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                    variant="outline"
-                    className="bg-white border-2 border-black shadow-neo font-black uppercase"
-                >
-                    <ChevronLeft className="h-5 w-5 mr-1" /> Prev
-                </Button>
-                <span className="text-lg font-black uppercase bg-black text-white px-4 py-2 border-2 border-black shadow-neo-sm">
-                    Page {currentPage} / {totalPages}
-                </span>
-                <Button
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                    variant="outline"
-                    className="bg-white border-2 border-black shadow-neo font-black uppercase"
-                >
-                    Next <ChevronRight className="h-5 w-5 ml-1" />
-                </Button>
-            </div>
+            {paginatedResult.length > 0 && (
+                <div className="flex justify-between items-center mt-10 mb-20">
+                    <Button
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        variant="outline"
+                        className="bg-white border-2 border-black shadow-neo font-black uppercase"
+                    >
+                        <ChevronLeft className="h-5 w-5 mr-1" /> Prev
+                    </Button>
+                    <span className="text-lg font-black uppercase bg-black text-white px-4 py-2 border-2 border-black shadow-neo-sm">
+                        Page {currentPage} / {totalPages}
+                    </span>
+                    <Button
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        variant="outline"
+                        className="bg-white border-2 border-black shadow-neo font-black uppercase"
+                    >
+                        Next <ChevronRight className="h-5 w-5 ml-1" />
+                    </Button>
+                </div>
+            )}
         </div>
     )
 }
