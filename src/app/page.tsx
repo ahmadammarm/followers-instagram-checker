@@ -57,7 +57,8 @@ export default function Home() {
 
     const filteredResult = result.filter((user) => {
         const isWhitelisted = whitelist.includes(user.href)
-        const matchesSearch = user.value.toLowerCase().includes(searchQuery.toLowerCase())
+        const username = user.value || ""
+        const matchesSearch = username.toLowerCase().includes(searchQuery.toLowerCase())
         return !isWhitelisted && matchesSearch
     })
 

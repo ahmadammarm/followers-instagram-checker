@@ -43,7 +43,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ label, fileType, onFileUplo
                         href: user.href,
                         value: user.value,
                     })) || []
-                );
+                ).filter(user => user.value && user.href);
 
             let extractedData: User[] = [];
 
