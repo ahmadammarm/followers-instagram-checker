@@ -1,7 +1,7 @@
 "use client"
 
 import FileUploader from "@/components/FileUploader"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import ResultTable from "@/components/ResultTable"
 import { Button } from "@/components/ui/button"
 import TutorialDialog from "@/components/TutorialDialog"
@@ -15,6 +15,33 @@ export default function Home() {
     const [following, setFollowing] = useState<User[] | null>(null)
     const [followers, setFollowers] = useState<User[] | null>(null)
     const [result, setResult] = useState<User[]>([])
+    const [searchQuery, setSearchQuery] = useState<string>("")
+    const [whitelist, setWhitelist] = useState<string[]>([])
+
+    // Load whitelist from localStorage on mount
+    useEffect(() => {
+        const savedWhitelist = localStorage.getItem("ig_checker_whitelist")
+        if (savedWhitelist) {
+            try {
+                setWhitelist(JSON.parse(savedWhitelist))
+            } catch (e) {
+                console.error("Failed to parse whitelist from localStorage", e)
+            }
+        }
+    }, [])
+
+    // Save whitelist to localStorage when it changes
+    useEffect(() => {
+        localStorage.setItem("ig_checker_whitelist", JSON.stringify(whitelist))
+    }, [whitelist])
+
+    const handleAddToWhitelist = (href: string) => {
+        setWhitelist((prev) => [...prev, href])
+    }
+
+    const handleRemoveFromWhitelist = (href: string) => {
+        setWhitelist((prev) => prev.filter((item) => item !== href))
+    }
 
     const handleCompare = () => {
         if (following && followers) {
@@ -28,9 +55,19 @@ export default function Home() {
         }
     }
 
+    const filteredResult = result.filter((user) => {
+        const isWhitelisted = whitelist.includes(user.href)
+        const matchesSearch = user.value.toLowerCase().includes(searchQuery.toLowerCase())
+        return !isWhitelisted && matchesSearch
+    })
+
+    const whitelistedData = result.filter((user) => whitelist.includes(user.href))
+
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-            <h1 className="text-2xl font-bold mb-4 mt-10">Instagram Follower Checker</h1>
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+            <h1 className="text-4xl md:text-5xl font-black mb-8 mt-10 uppercase tracking-tighter text-center">
+                Instagram Follower Checker
+            </h1>
             <FileUploader
                 label="Upload File JSON Follower"
                 fileType="followers"
@@ -49,7 +86,16 @@ export default function Home() {
             >
                 Bandingkan
             </Button>
-            {result.length > 0 && <ResultTable result={result} />}
+            {result.length > 0 && (
+                <ResultTable
+                    result={filteredResult}
+                    onWhitelist={handleAddToWhitelist}
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    whitelistData={whitelistedData}
+                    onRemoveFromWhitelist={handleRemoveFromWhitelist}
+                />
+            )}
         </div>
     )
 }

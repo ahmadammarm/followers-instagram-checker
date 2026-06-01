@@ -68,18 +68,18 @@ const FileUploader: React.FC<FileUploaderProps> = ({ label, fileType, onFileUplo
     };
 
     return (
-        <>
-            <div className="p-4 border rounded bg-gray-100 mb-4">
-                <label className="block mb-2 text-sm font-medium">{label}</label>
+        <div className="w-full max-w-md">
+            <div className="p-6 border-2 border-black rounded-none bg-white mb-4 shadow-neo">
+                <label className="block mb-3 text-sm font-black uppercase tracking-wide">{label}</label>
                 <Input
                     type="file"
                     accept=".json"
                     onChange={handleFileUpload}
-                    className="w-full text-sm text-gray-600 file:mr-4 file:border file:rounded file:border-gray-300 file:bg-gray-50 hover:file:bg-gray-100"
+                    className="w-full"
                 />
             </div>
-            {error && <p className="text-red-500 mt-2 mb-2 text-center">{error}</p>}
-        </>
+            {error && <p className="text-red-600 font-bold mt-2 mb-4 text-center bg-red-50 border-2 border-red-600 p-2 shadow-neo-sm">{error}</p>}
+        </div>
     );
 };
 
