@@ -47,10 +47,14 @@ export default function Home() {
 
     const handleCompare = () => {
         if (following && followers) {
-            const followerMap = new Map(followers.map((user) => [user.href, user.value]))
+            // Create a set of follower usernames for O(1) lookup
+            const followerUsernames = new Set(
+                followers.map((user) => user.value.toLowerCase())
+            )
 
+            // Filter out following users who are not in the follower set
             const notFollowingBack = following.filter(
-                (user) => !followerMap.has(user.href) || followerMap.get(user.href) !== user.value,
+                (user) => !followerUsernames.has(user.value.toLowerCase())
             )
 
             setResult(notFollowingBack)
