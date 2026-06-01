@@ -28,6 +28,7 @@ interface FileUploaderProps {
 
 const FileUploader: React.FC<FileUploaderProps> = ({ label, fileType, onFileUploaded }) => {
     const [error, setError] = useState<string>("");
+    const [count, setCount] = useState<number | null>(null);
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -37,27 +38,36 @@ const FileUploader: React.FC<FileUploaderProps> = ({ label, fileType, onFileUplo
             const fileContent = await file.text();
             const jsonData: any = JSON.parse(fileContent);
 
-            const extractUsername = (href: string): string => {
-                try {
-                    // Handle both https://www.instagram.com/username and https://www.instagram.com/_u/username
-                    const url = new URL(href);
-                    const parts = url.pathname.split("/").filter(Boolean);
-                    return parts[parts.length - 1].toLowerCase();
-                } catch (e) {
-                    const parts = href.split("/").filter(Boolean);
-                    return parts[parts.length - 1].toLowerCase();
+            const extractUsername = (item: any, user: any): string => {
+                // Priority 1: Explicit value field (common in followers)
+                if (user.value) return user.value.toLowerCase();
+                
+                // Priority 2: Title field in parent (common in following)
+                if (item.title) return item.title.toLowerCase();
+
+                // Priority 3: Extract from href URL
+                if (user.href) {
+                    try {
+                        const url = new URL(user.href);
+                        const parts = url.pathname.split("/").filter(Boolean);
+                        const lastPart = parts[parts.length - 1];
+                        return lastPart.toLowerCase();
+                    } catch (e) {
+                        const parts = user.href.split("/").filter(Boolean);
+                        return parts[parts.length - 1].toLowerCase();
+                    }
                 }
+                return "";
             };
 
             let extractedData: User[] = [];
 
             if (fileType === "followers") {
-                // Followers can be an array (old) or an object with relationships_followers (new)
                 const items = Array.isArray(jsonData) ? jsonData : jsonData.relationships_followers || [];
                 extractedData = items.flatMap((item: any) =>
                     item.string_list_data?.map((user: any) => ({
                         href: user.href,
-                        value: extractUsername(user.href),
+                        value: extractUsername(item, user),
                     })) || []
                 );
             } else if (fileType === "following") {
@@ -65,25 +75,29 @@ const FileUploader: React.FC<FileUploaderProps> = ({ label, fileType, onFileUplo
                 extractedData = items.flatMap((item: any) =>
                     item.string_list_data?.map((user: any) => ({
                         href: user.href,
-                        value: extractUsername(user.href),
+                        value: extractUsername(item, user),
                     })) || []
                 );
             }
 
-            // Final filter to ensure we have valid data
             const cleanData = extractedData.filter(user => user.value && user.href);
             onFileUploaded(cleanData);
+            setCount(cleanData.length);
             setError("");
         } catch (error) {
             console.error(error);
             setError("Gagal membaca file. Pastikan upload file JSON nya sesuai yaaaa");
+            setCount(null);
         }
     };
 
     return (
         <div className="w-full max-w-md">
             <div className="p-6 border-2 border-black rounded-none bg-white mb-4 shadow-neo">
-                <label className="block mb-3 text-sm font-black uppercase tracking-wide">{label}</label>
+                <label className="block mb-1 text-sm font-black uppercase tracking-wide">{label}</label>
+                {count !== null && (
+                    <p className="text-xs font-bold text-blue-600 mb-3 uppercase">Terdeteksi: {count} Akun</p>
+                )}
                 <Input
                     type="file"
                     accept=".json"
